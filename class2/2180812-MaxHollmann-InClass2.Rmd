@@ -1,0 +1,97 @@
+In-class Challenge 2
+========================================================
+
+Name: | StudentNumber:
+------|------
+Max Hollmann | 2180812
+
+Assignment:
+-----------
+
+### 1
+Use R's built-in help to determine what the `rnorm()` function does. Describe it in one or two sentences.
+
+It returns `n` random numbers from a normal distribution with the specified mean and standard deviation.
+
+
+### 2
+Choose a nice round integer between ten thousand and one million. Save it as a variable called `N` (we are going to use this as a sample size). Does this variable contain a scalar, vector, or matrix?
+
+```{r}
+N <- 1000
+```
+
+N is a scalar.
+
+### 3
+
+Draw N samples from a normal distribution, and save these samples in a variable called `samples`. (pick your own mean and standard deviation). Does samples contain a scalar, vector, or matrix?
+
+
+```{r}
+samples <- rnorm(N, 100, 30)
+```
+
+This returns a vector.
+
+### 4
+
+Suppose these numbers represent successive samples from some population, and you wanted to know the cumulative mean for your samples; that is, you want N values, each of which represents the mean of samples only up to that point. Example: if `x = c(1,2,6)`, then the cumulative mean vector would be `c(1,1.5,3)`. 
+
+A first step to computing a mean is computing a sum. Use R's `help.search()` function to find the function to compute cumulative sums.
+
+Save the cumulative sums in a new vector, called `sums`.
+
+```{r}
+sums <- cumsum(samples)
+```
+
+### 5
+
+Each element of `sums` is a sum. Confirm that the last element of `sums` is the sum of all values in `samples`, using the `sum()` function. Use the `==` comparison to print the boolean value represing the (in)equality.
+
+```{r}
+tail(sums, 1) == sum(samples)
+```
+
+### 6
+
+What do you have to do to use sums to compute cumulative means? Do it, and save the result to a variable called means.
+
+```{r}
+means <- sums / seq(1, length(sums))
+plot(means)
+```
+
+### 7
+
+Sample one random number from `1:10`, and write a set of `if-then` rules that prints to the console whether the sampled number if smaller than 3, smaller than 7, or larger or equal to 7.
+
+```{r}
+n <- sample(1:10, 1)
+print(paste(n, "is ..."))
+print(paste0(if(n >= 3) "not ", "smaller than 3"))
+print(paste0(if(n >= 7) "not ", "smaller than 7"))
+print(paste0(if(n < 7) "not ", "greater or equal to 7"))
+```
+
+### 8
+
+Create a data frame that represents the grades of a group of 50 students in a course. The first column should contain a studentID drawn from the list of student IDs created by this command:
+
+```{r}
+studentID <- as.vector(outer(letters, letters, paste, sep = ""))
+```
+
+and the second column should represent the grade of the student.
+
+```{r}
+df <- data.frame(id = sample(studentID, 50), grade = sample(1:10, 50, replace = TRUE))
+```
+
+Now calculate the mean score of the students of this course and try to find a way to calculate what the proportion of students is that has passed this course. For this last assignment, study the next bit of code:
+
+```{r}
+mean(df$grade)
+sum(df$grade >= 6)
+```

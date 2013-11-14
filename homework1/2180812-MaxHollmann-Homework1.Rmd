@@ -1,0 +1,22 @@
+Homework Week 1
+========================================================
+
+Name: | StudentNumber:
+------|------
+YourNameHere | YourStudentNumberHere
+
+Homework:
+-----------
+
+### 1
+**Tell us about your previous programming experiences and your expectations for this course (in less than 300 words).**
+
+[Your answer goes here.]
+
+
+### 2
+**One of R's strengths is the number of completely free add-ons available for R. You can see a list of them at http://cran.r-project.org/web/packages/. Find a package that looks interesting to you, and figure out what it does by opening and reading part of the manual.**
+
+**Install the package from CRAN on your computer using the packages menu in R. Successfully load the package using the `library()` function. Write about 300 words about what the package does, and why it is interesting.**
+
+[Your answer goes here.]
