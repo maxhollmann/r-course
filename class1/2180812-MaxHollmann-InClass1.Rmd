@@ -3,20 +3,21 @@ In-class Challenge 1
 
 Name: | StudentNumber:
 ------|------
-Max Hollmann | s2180812
+Max Hollmann | 2180812
 
 Assignment:
 -----------
 
 ### 1
 **Suppose you are going to play a lottery in which you need 6 (not necessarily unique) numbers, from 0-99. Create a vector containing your 6 numbers, and save the vector in a variable called lottery.**
+
 ```{r}
-lottery <- sample(0:99, size = 6, replace = TRUE)
-lottery
+print(lottery <- sample(0:99, size = 6, replace = TRUE))
 ```
 
 ### 2
 **Use the max() and min() function on your lottery variable. What do these functions return? Are the results scalars, vectors, or matrices?**
+
 ```{r}
 min(lottery)
 max(lottery)
@@ -26,6 +27,7 @@ Results are scalars, since there's only one highest and lowest value.
 
 ### 3
 **Use the sample() function on your lottery variable. Based on the results, what do you think the sample() function does? Is the result a scalar, vector, or matrix?**
+
 ```{r}
 sample(lottery)
 ```
@@ -33,6 +35,7 @@ sample(lottery)
 It takes a random sample from the lottery vector, apparently using all elements without replacement by default.
 
 ### 4
+
 **Consider the following code:** 
 ```{r, eval=FALSE}
 max(sample(lottery))
@@ -61,8 +64,7 @@ var <- lottery[1]
 ### 7
 **Consider the following code:**
 ```{r}
-lottery2 <- outer(lottery,lottery,'-')
-lottery2
+print(lottery2 <- outer(lottery,lottery,'-'))
 ```
 
 **Run the code, and save the result in a variable called lottery2. Based on the results, can you tell what the outer function did? Is the result a scalar, vector, or matrix?**
@@ -73,8 +75,7 @@ It takes combines each element of the vector with all elements through the speci
 **If you wanted to just access the value in the second row, third column of lottery2 and save that single value in a variable, how would you do it? Check the value contained in your new variable. Is it correct?**
 
 ```{r}
-var <- lottery2[2, 3]
-var
+print(var <- lottery2[2, 3])
 ```
 
 Yay!
@@ -83,8 +84,7 @@ Yay!
 **If you wanted to save the whole second row as a new variable, how would you do it? Will this new variable contain a scalar, vector, or matrix?**
 
 ```{r}
-row2 <- lottery2[2,]
-row2
+print(row2 <- lottery2[2,])
 ```
 
 Surprise! It's a vector.
