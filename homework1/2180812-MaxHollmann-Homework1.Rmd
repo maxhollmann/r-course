@@ -3,7 +3,7 @@ Homework Week 1
 
 Name: | StudentNumber:
 ------|------
-YourNameHere | YourStudentNumberHere
+Max Hollmann | 2180812
 
 Homework:
 -----------
@@ -11,12 +11,41 @@ Homework:
 ### 1
 **Tell us about your previous programming experiences and your expectations for this course (in less than 300 words).**
 
-[Your answer goes here.]
+Long story short: My dad showed me some dialect of Basic about 8 years ago, I got hooked, went on to learn C++ to try and fail to write awesome games, then some Java in school, started making websites in PHP, later on learned Ruby for a job. Ruby is so beautiful that I now hate all the other languages, except R, which is cool, because it's the first letter of Ruby. I looked into R when we had to do analyses for a course and I was annoyed with SPSS because it's really clunky and its syntax is crap, and also it's about 1000€ too expensive.
 
+Expectations for this course? I guess to get deeper into R, hopefully learn how to do ANOVA properly, I could never figure out how to get the same results as with SPSS.
 
 ### 2
 **One of R's strengths is the number of completely free add-ons available for R. You can see a list of them at http://cran.r-project.org/web/packages/. Find a package that looks interesting to you, and figure out what it does by opening and reading part of the manual.**
 
 **Install the package from CRAN on your computer using the packages menu in R. Successfully load the package using the `library()` function. Write about 300 words about what the package does, and why it is interesting.**
 
-[Your answer goes here.]
+The [`rgl`](http://cran.r-project.org/web/packages/rgl/index.html) package provides an interface for R to the graphics library OpenGL. This makes it possible not only to generate 3D plots of data, but also to navigate around these plots with the mouse. `rgl` provides both high-level functions to quickly generate common plots (e.g. scatter plots, see example below), and lower-level functions that allow very fine-grained control over the output. Also, it’s really simple to export the generated scenes to different formats (e.g. `writeWebGL`, which exports to WebGL, 3D for browsers. [Here](https://dl.dropboxusercontent.com/u/2886217/webgl.html)'s my example embedded on a webpage).
+
+Besides the high-level convenience functions like `plot3d`, it isn't too hard to generate custom plots. For example, generating a 3D barplot (like the one shown on the right [here](http://rgl.neoscientists.org/gallery.shtml)) can be done using the function `rgl.quads`, which just draws a rectangle on the screen.
+
+I find this library really useful for multiple reasons. First, it obviously allows showing more variables in a single plot than is possible in 2D plots. Second, interactive plots are way more fun than static ones. It is even possible to generate 2D plots from the 3D scene, using `rgl.viewpoint` to show the plot from the side, top, or whatever makes sense, although 2D plotting libraries are probably a better solution for this.
+
+Here's an example plotting various data about US states in a scatterplot:
+
+```{r}
+suppressMessages({
+  library(rgl)
+  library(fields)
+})
+
+# data about us states
+data(state)
+df <- as.data.frame(state.x77)
+
+# color handling from https://stat.ethz.ch/pipermail/r-help/2007-July/135904.html
+colindex <- as.integer(cut(df[,'Life Exp'], breaks = 50))
+plot3d(
+  df$Population/1000, df$Murder, df$Illiteracy,                 # x, y, z axes
+  type = "s", radius = df$Income / 10000,                       # income coded as sphere radius
+  col = tim.colors(50)[colindex],                               # life expectancy coded as color
+  xlab = "Population", ylab = "Murder", zlab = "Illiteracy",    # axis labels
+  box = TRUE                                                    # draw a box around the plot
+)
+rgl.viewpoint(280, 20)                                          # set the camera to a better angle
+```

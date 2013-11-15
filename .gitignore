@@ -2,3 +2,6 @@ bundle
 .bundle
 tmp
 **/*.html
+.Rhistory
+**/figure
+*.md
