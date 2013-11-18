@@ -1,0 +1,89 @@
+In-class Challenge 3
+========================================================
+
+Name: | StudentNumber:
+------|------
+Max Hollmann | 2180812
+
+Assignment:
+-----------
+
+### 1
+
+Consider the following English (in both senses of the word) sentence: "If I have eggs and bacon, I can make breakfast.."
+
+This is a conditional. Create the two variables (`eggs` and `bacon`) to store the two important truth values, setting them equal to whatever truth values you wish.
+```{r}
+eggs = TRUE
+bacon = TRUE
+```
+
+
+### 2
+Create an `if` statement in R that tells you if you can make breakfast. You might try the `cat()` or `print()` functions. 
+```{r}
+if (eggs & bacon)
+  print("Yay, breakfast!")
+```
+
+
+### 3
+Modify the "if" statement in R by adding an "else", that tells you if you CAN'T make breakfast.
+```{r}
+if (eggs & bacon) {
+  print("Yay, breakfast!")
+} else {
+  print("Nope")
+}
+```
+
+
+### 4
+Suppose that eggs came in two varieties: brown and white, and bacon came in two varieties, good and rancid. We can make breakfast with either brown or white eggs, but we can only make breakfast with good bacon. Create a new variable called `eggs` that contains either the value `brown` or `white`, and a variable called `bacon` that contains either `good` or `rancid`. Create a statement in R that returns `TRUE` when we can make breakfast. (Remember: use parentheses to group statements together to make them clear!)
+```{r}
+eggs = "brown"
+bacon = "good"
+cat("Can we make breakfast?", bacon == "good" & (eggs == "brown" | eggs == "white"), "\n")
+```
+
+
+### 5
+Modify exercise (3) using the new conditional.
+```{r}
+if (bacon == "good" & (eggs == "brown" | eggs == "white")) {
+  print("Yay, breakfast!")
+} else {
+  print("Nope")
+}
+```
+
+
+### 6
+Create a function called `canWeMakeBreakfast()` that takes two arguments, `eggs` and `bacon`, and returns `TRUE` if we can make breakfast, and `FALSE` if we cannot.
+
+```{r}
+canWeMakeBreakfast <- function(eggs = "brown", bacon = "good") {
+  bacon == "good" & (eggs == "brown" | eggs == "white")
+}
+```
+
+
+### 7
+Modify the function in (6) so that its default arguments are `brown` eggs and `good` bacon. What happens when you run the following code:
+```{r, eval=FALSE}
+canWeMakeBreakfast(eggs="white") 
+```
+
+What did you expect? Does it do what you expected?
+
+I expected it to be true, and it was.
+
+### 8
+
+Create a vector called `days` that contains the days of the week, and use a `for` loop to print out these names to the screen.
+
+```{r}
+days = c("monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday")
+for (day in days)
+  print(day)
+```
