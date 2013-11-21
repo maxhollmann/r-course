@@ -1,0 +1,83 @@
+In-class Challenge 4
+========================================================
+
+Name: | StudentNumber:
+------|------
+Max Hollmann | 2180812
+
+Assignment:
+-----------
+
+### 1
+**Go back to the in-class assignments for class 2 and copy the necessary code to compute the cummulative means that should be stored in a variable called `means`.**
+```{r}
+samples <- rnorm(1000, 100, 30)
+sums <- cumsum(samples)
+means <- sums / seq(1, length(sums))
+```
+
+
+### 2
+**Create a plot of the cummulative mean with the number of sampels on the x-axis and the cummulative mean on the y-axis. Give your plot a descriptive title and provide appropriate labels for the axes. What does the `type` parameter of the `plot` function do?**
+```{r}
+plot(means,
+     type = "l",
+     xlab = "Index", ylab = "Cumulative means")
+title("Cumulative means by index")
+```
+
+The `type` parameter changes the way data are plotted, e.g. lines connecting the data points, just points, etc.
+
+### 3
+**Create a random number between 100 and 200 and store it a variable called `N`. Draw `N` random samples from a normal distrbution with mean 0 and standard deviation 100 and store them in a variable called `x`. Draw another `N` samples from a normal distribution and store them in a variable called `y`. Add 1000 to `x` and 3000 to `y`.**
+```{r}
+N <- sample(100:200, 1)
+x <- rnorm(N, 0, 100) + 1000
+y <- rnorm(N, 0, 100) + 3000
+```
+
+
+### 4
+**Create an empty plot. Then loop through your `N` samples using a `for` loop and add the data points to the plot using the `points` function. Implement the following rules for how the points are drawn: If the `N`th `x` value is less than or equal to 1000, use a minus as a plotting character. Otherwise use a plus. If the `N`th `y` value is smaller than 900, plot it in red. If it's between 2900 and 3000, plot it in blue. If it is between 3000 and 3100, plot it in yellow. If it's greater than 3100, plot it in green. Make sure your code is commented well.**
+```{r}
+# The "empty" plot:
+plot(NA, xlim=c(700, 1300), ylim=c(2700, 3300), xlab="", ylab="") 
+
+# Your answer goes here.
+
+# returns the appropriate sign for a given x
+sign <- function(x) {
+  if (x <= 1000) { '-' }
+  else           { '+' }
+}
+
+# returns the appropriate color for a given y
+color <- function(y) {
+  if (y < 2900)                   { 'red' }
+  else if (y >= 2900 && y < 3000) { 'blue' }
+  else if (y >= 3000 && y < 3100) { 'yellow' }
+  else if (y >= 3100)             { 'green' }
+}
+
+# iterate over the sample
+for (i in 1:N) {
+  # use the functions defined above to determine the sign and color for the current point
+  points(x[i], y[i], pch = sign(x[i]), col = color(y[i]))
+}
+```
+
+### 5
+**Use the help to find a way to create a histogram of your `x`. Play around with the parameters to make your histogram look a bit nicer.**
+```{r}
+hist(x, col = rgb(1, .5, 0), density = 10, angle = 60)
+```
+
+
+### 6
+**You can still use all functions that *add* things to your plot. Add a thick, red, vertical line to your histogram in order to denote the mean of `x`.**
+```{r}
+h <- hist(x, col = rgb(1, .5, 0), density = 10, angle = 60)
+
+# h$counts contains the count of each bar in the plot; draw the line as high as the highest bar goes
+lines(rep(mean(x), 2), c(0, max(h$counts)), lwd = 5, col = 'red')
+```
