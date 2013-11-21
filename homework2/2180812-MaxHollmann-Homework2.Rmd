@@ -1,0 +1,90 @@
+Homework Week 2
+========================================================
+
+Name: | StudentNumber:
+------|------
+Max Hollmann | 2180812
+
+Homework:
+-----------
+
+### Draw a face!
+**Use R's plotting environment to draw a face. Here's an empty plotting window that you can fill:**
+
+```{r face}
+plot(NA, main='', xlim=c(-100, 100), ylim=c(-100, 100), asp = 1, axes=TRUE, xlab='', ylab='')
+
+# background
+s = 100
+rect(-s, -s, s, s, col = 'lightblue', border = 'black')
+
+# body
+points(0, -120, pch = 16, col = "#AA0000", cex = 60)
+lines(c(-1, -1), c(-50, -150))
+for (y in seq(-75, -150, -15)) {
+  points(2, y, pch = 16, col = 'black', cex = 1)
+}
+
+# face
+for (x in -5:5) {
+  points(x, -17, pch = 16, col = "#F2CE94", cex = 35)
+}
+
+# eyes
+offset = runif(2, -8, 8)
+for (x in c(-14, 14)) {
+  points(x, -15, pch = 16, col = 'white', cex = 10)
+  points(x + offset[1], -15 + offset[2], pch = 16, col = 'black', cex = 1.5)
+}
+
+# chubby chin
+# lower
+x = seq(-42, -2, 10)
+y = c(-47, -57, -62, -64, -65)
+x = c(x, -rev(x))
+y = c(y, rev(y))
+lines(x, y)
+# upper
+lines(c(-10, 0, 10),
+      c(-60, -61.5, -60))
+
+# mouth
+inc = runif(1, -1, 1)
+for (x in -5:5) {
+  points(x, -53 + inc*x/6.6, pch = 16, col = 'black', cex = 2.5)
+}
+
+# hat; starts at lower left corner
+offset = runif(1, -20, 10)
+polygon(c(-70, 65, 40, 20 + offset, 10 + offset * 2.5, -10 + offset, -33),
+        c(  0, -5, 20,          60,               105,           60,  25),
+        col = "#0F8C64", border = NA)
+# ring around hat
+lines(c(-65, 60), c(3, 0), lwd = 3, col = 'yellow')
+# star on hat
+for (char in c(24, 25)) {
+  points(0, 25, pch = char, col = "yellow", cex = 5.5, bg = "yellow")
+}
+
+# stick
+hand = list(x = -70, y = -70)
+x = runif(1, -30, -10)
+polygon(c(x-5, x+5, -x+2, -x-2) + hand$x, # makes sure the stick stays in his hand
+        c(50, 50, -150, -150),
+        col = "#735019", border = NA)
+# 3Dish effect
+polygon(c(x-7, x-5, -x, -x-2) + hand$x, # makes sure the stick stays in his hand
+        c(50, 50, -150, -150),
+        col = "#825F26", border = NA)
+
+# hands
+# right
+points(70, -85, pch = 16, col = "#C48114", cex = 10)
+points(60, -90, pch = 16, col = "#C48114", cex = 4.5) # thumb
+# left, holding stick
+points(hand$x, hand$y, pch = 16, col = "#C48114", cex = 10)
+```
+
+Although you can create a face by just calling functions like `points`, `lines`, `rect`, `symbols` and building up the face like this, an **additional points will be awarded** if the face is drawn using `for` loops or functions like `runif`. 
+
+A couple of example faces from last year will be uploaded under *Course Documents* on Nestor.
