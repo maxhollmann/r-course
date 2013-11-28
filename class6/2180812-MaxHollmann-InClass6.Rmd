@@ -1,0 +1,26 @@
+In Class 6
+========================================================
+
+Spend some time today (and during the next week) to finish all previous assignments. The in class assingment for Class 6 is to write a function `throwDie` which simulates the throw of a single die ("dobbelsteen", "Würfel").
+
+```{r}
+throwDie = function() {
+  sample(1:6, 1)
+}
+```
+
+Write another function that takes a single goal number, and returns the number of throws of the simulated die that were necessary to reach the given number. Use a `while` loop, and make sure that you check whether the given goal number is valid. (I.e., what should be done when a negative number is provided?)
+
+```{r}
+throwsUntil <- function(goal) {
+  current = 0
+  n = 0
+  while (current < goal) {
+    current = current + throwDie()
+    n = n + 1
+  }
+  return(n)
+}
+goal = sample(1:1000000, 1)
+cat("It took", throwsUntil(goal), "throws to reach", goal, ".\n")
+```

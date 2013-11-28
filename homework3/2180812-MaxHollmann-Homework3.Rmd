@@ -1,0 +1,98 @@
+Homework Week 3
+========================================================
+
+Name: | StudentNumber:
+------|------
+Max Hollmann | 2180812
+
+Homework:
+-----------
+
+In the next two weeks, we're going to build a Tic-Tac-Toe game. The first step that's always important in programming is to think about the internal representations (what we've called "variables" upto now) that are necessary. In Tic-Tac-Toe the main representation is, of course, the game board. 
+
+### 1
+
+The game of tic-tac-toe is played on a board of 3x3, which might be represented in R by the following statement.
+```{r}
+gameboard <- matrix(0, nrow=3, ncol=3)
+```
+
+Moves can be represented by setting cells of this matrix to -1 (for player 1) or 1 (for player 2).
+```{r}
+gameboard[2,2] <- -1
+gameboard
+gameboard[1,2] <- 1
+gameboard
+```
+
+Write a function (see template below) that returns -3 or 3 if there are three of the same markers in any row, and 0 otherwise. Use `rowSums()`.
+
+```{r}
+winnerSum <- function(sums) {
+  if (any(sums == 3))  return(3)
+  if (any(sums == -3)) return(-3)
+  return(0)
+}
+winnerRow <- function(m) {
+  s = rowSums(m)
+  winnerSum(s)
+}
+```
+
+### 2
+Write a function that returns -3 or 3 if there are three of the same markers in any column, and 0 otherwise. Use `colSums()`.
+
+```{r}
+winnerCol <- function(m) {
+  s = colSums(m)
+  winnerSum(s)
+}
+```
+
+
+### 3
+Write a function that returns -3 or 3 if there are three of the same markers in either diagonal, and 0 otherwise. Use either `diag()`, or use direct indexing (e.g., statements like `gameboard[1,3]`).
+
+```{r}
+winnerDiag <- function(m) {
+  s = c(
+    sum(diag(m)),
+    
+    # rotate matrix by 90 degrees clockwise
+    # code from http://stackoverflow.com/questions/16496210/rotate-a-matrix-in-r
+    sum(diag(t(apply(m, 2, rev))))
+  )
+  winnerSum(s)
+}
+```
+
+### 4
+Write a function that checks to see if someone has won. Write a line of text on the screen (using `cat()`) to provide relevant output (e.g., “Player 1 wins!”).
+
+```{r}
+winner <- function(m) {
+  w = c(winnerRow(m), winnerCol(m), winnerDiag(m))
+  if (any(w == -3)) return(1)
+  if (any(w == 3))  return(2)
+  return(0)
+}
+
+m = matrix(c(
+  -1, -1,  1,
+   0,  1, -1,
+   1, -1, -1
+), nrow = 3)
+print(m)
+print("Player 1 is -1; player 2 is 1")
+cat("Winner is player", winner(m), "\n")
+
+
+m = matrix(c(
+   1, -1, -1,
+  -1,  1, -1,
+   0, -1, -1
+), nrow = 3)
+print(m)
+print("Player 1 is -1; player 2 is 1")
+cat("Winner is player", winner(m), "\n")
+```

@@ -12,6 +12,8 @@ Homework:
 **Use R's plotting environment to draw a face. Here's an empty plotting window that you can fill:**
 
 ```{r face}
+library(plotrix)
+
 plot(NA, main='', xlim=c(-100, 100), ylim=c(-100, 100), asp = 1, axes=TRUE, xlab='', ylab='')
 
 # background
@@ -19,22 +21,22 @@ s = 100
 rect(-s, -s, s, s, col = 'lightblue', border = 'black')
 
 # body
-points(0, -120, pch = 16, col = "#AA0000", cex = 60)
+draw.circle(0, -120, 85, border = NA, col = "#AA0000")
 lines(c(-1, -1), c(-50, -150))
 for (y in seq(-75, -150, -15)) {
-  points(2, y, pch = 16, col = 'black', cex = 1)
+  draw.circle(2, y, 2, border = NA, col = 'black')
 }
 
 # face
 for (x in -5:5) {
-  points(x, -17, pch = 16, col = "#F2CE94", cex = 35)
+  draw.circle(x, -17, 35*(85/60), border = NA, col = "#F2CE94")
 }
 
 # eyes
 offset = runif(2, -8, 8)
 for (x in c(-14, 14)) {
-  points(x, -15, pch = 16, col = 'white', cex = 10)
-  points(x + offset[1], -15 + offset[2], pch = 16, col = 'black', cex = 1.5)
+  draw.circle(x, -15, 10*(85/60), border = NA, col = 'white')
+  draw.circle(x + offset[1], -15 + offset[2], 1.5*(85/60), col = 'black', border = NA)
 }
 
 # chubby chin
@@ -51,7 +53,7 @@ lines(c(-10, 0, 10),
 # mouth
 inc = runif(1, -1, 1)
 for (x in -5:5) {
-  points(x, -53 + inc*x/6.6, pch = 16, col = 'black', cex = 2.5)
+  draw.circle(x, -53 + inc*x/6.6, 2.5*(85/60), col = 'black', border = NA)
 }
 
 # hat; starts at lower left corner
@@ -62,9 +64,7 @@ polygon(c(-70, 65, 40, 20 + offset, 10 + offset * 2.5, -10 + offset, -33),
 # ring around hat
 lines(c(-65, 60), c(3, 0), lwd = 3, col = 'yellow')
 # star on hat
-for (char in c(24, 25)) {
-  points(0, 25, pch = char, col = "yellow", cex = 5.5, bg = "yellow")
-}
+symbols(0, 25, stars = matrix(rep(c(8, 13), 6), nrow = 1), fg = NA, bg = 'yellow', inches = FALSE, add = TRUE)
 
 # stick
 hand = list(x = -70, y = -70)
@@ -79,10 +79,10 @@ polygon(c(x-7, x-5, -x, -x-2) + hand$x, # makes sure the stick stays in his hand
 
 # hands
 # right
-points(70, -85, pch = 16, col = "#C48114", cex = 10)
-points(60, -90, pch = 16, col = "#C48114", cex = 4.5) # thumb
+draw.circle(70, -85, 10*(85/60), col = "#C48114", border = NA)
+draw.circle(60, -90, 4.5*(85/60), col = "#C48114", border = NA) # thumb
 # left, holding stick
-points(hand$x, hand$y, pch = 16, col = "#C48114", cex = 10)
+draw.circle(hand$x, hand$y, 10*(85/60), col = "#C48114", border = NA)
 ```
 
 Although you can create a face by just calling functions like `points`, `lines`, `rect`, `symbols` and building up the face like this, an **additional points will be awarded** if the face is drawn using `for` loops or functions like `runif`. 
