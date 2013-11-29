@@ -1,14 +1,10 @@
-# clear workspace to make sure the script doesn't depend on old stuff
-rm(list = ls())
-
-
 ###############################################################################
 # NOTES
 # 
 # Moves are represented as vectors in the format c(row, column), where row and
 # column are integers between 1 and 3.
 # 
-# Player -1 is o, 1 is x.
+# Player 1 is -1 or O, player 2 is 1 or X.
 ###############################################################################
 
 
@@ -48,6 +44,16 @@ isFull <- function(m) {
 }
 ###############################################################################
 
+createProgressBar <- function(max) {
+  txtProgressBar(
+    min   = 0,
+    max   = max,
+    style = 3 # mark ends with '|', show percentage
+  )
+}
+increaseProgressBar <- function(bar) {
+  setTxtProgressBar(bar, getTxtProgressBar(bar) + 1)
+}
 
 # returns TRUE if the move is possible, FALSE otherwise
 isPossible <- function(board, move) {
@@ -94,7 +100,7 @@ moveScore <- function(board, player, move, depth = 0) {
   
   prog = attr(moveScore, 'progress')
   if (!is.null(prog)) {
-    setTxtProgressBar(prog, getTxtProgressBar(prog) + 1)
+    increaseProgressBar(prog)
   }
   
   # new board after the move is executed
@@ -140,11 +146,7 @@ bestMoves <- function(board, player) {
   # show a progress bar when we have to analyze more than 1000 possibilities
   possibilities = ceiling(factorial(length(possibleMoves(board))) * 2/3)
   if (possibilities > 1000) {
-    attr(moveScore, 'progress') <<- txtProgressBar(
-      min   = 0,
-      max   = possibilities,
-      style = 3 # mark ends with '|', show percentage
-    )
+    attr(moveScore, 'progress') <<- createProgressBar(possibilities)
   }
   
   for (move in possibleMoves(board)) {
@@ -175,17 +177,6 @@ randomMove <- function(moves) {
   return(moves[[sample(1:length(moves), 1)]])
 }
 
-# ask the user to make a move
-humanMove <- function() {
-  move = c()
-  while (length(move) != 2 || any(move < 1) || any(move > 3)) {
-    move = readline("What's your move? [row col] ")
-    move = strsplit(move, ' ')[[1]]
-    move = as.integer(move)
-  }
-  return(move)
-}
-
 # return the sign of the player, or a dot for no player
 playerSign <- function(player) {
   if (player == -1) return('o')
@@ -204,31 +195,33 @@ printBoard <- function(board) {
   cat("\n")
 }
 
-
-winners = list()
-
-for (n in 1:20) {
-  # sink(paste0("game", n, ".txt"))
+# Plays a game of tic tac toe
+# player1 is -1, player2 is 1
+# When playerX.func is NULL, the AI plays for this player
+# Returns the return value of finish.func if present, otherwise NULL
+play <- function(player1.func = NULL, player2.func = NULL, updateBoard.func = NULL, finish.func = NULL) {
   board = matrix(ncol = 3, byrow = TRUE, data = c(
     0,  0,  0,
-    0,  1,  0,
+    0,  0,  0,
     0,  0,  0
   ))
+  if(!is.null(updateBoard.func)) updateBoard.func(board)
+  
   player = -1
-  printBoard(board)
   
   while (winner(board) == 0 && !isFull(board)) {
-    if (FALSE) {
-      move = humanMove()
+    if (player == -1 && !is.null(player1.func)) {
+      move = player1.func(board, player)
+    } else if (player == 1 && !is.null(player2.func)) {
+      move = player2.func(board, player)
     } else {
       move = randomMove(bestMoves(board, player))
     }
     board = makeMove(board, player, move)
-    printBoard(board)
+    if(!is.null(updateBoard.func)) updateBoard.func(board)
     player = -player
   }
-  winners[[n]] = winner(board)
-  # sink()
+  
+  if(!is.null(finish.func)) return(finish.func(winner(board)))
+  return(NULL)
 }
-
-print(winners)
