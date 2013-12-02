@@ -14,30 +14,24 @@ humanMove <- function() {
   return(move)
 }
 
-winners = list()
-
-for (n in 1:20) {
-  # sink(paste0("game", n, ".txt"))
-  board = matrix(ncol = 3, byrow = TRUE, data = c(
-    0,  0,  0,
-    0,  1,  0,
-    0,  0,  0
-  ))
-  player = -1
+updateBoard <- function(board) {
   printBoard(board)
-  
-  while (winner(board) == 0 && !isFull(board)) {
-    if (FALSE) {
-      move = humanMove()
-    } else {
-      move = randomMove(bestMoves(board, player))
-    }
-    board = makeMove(board, player, move)
-    printBoard(board)
-    player = -player
-  }
-  winners[[n]] = winner(board)
-  # sink()
+}
+
+winners = list("-1" = 0, "0" = 0, "1" = 0)
+
+for (n in 1:200) {
+  #sink(paste0("game", n, ".txt"))
+  continue = play(
+    updateBoard.func = updateBoard,
+    finish.func = function(winner) {
+      sink("winners.txt", append = TRUE)
+      cat(winner, "\n")
+      sink()
+    },
+    min.delay = 0
+  )
+  #sink()
 }
 
 print(winners)

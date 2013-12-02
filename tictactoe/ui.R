@@ -8,7 +8,7 @@ tktitle(tt) = "Tic Tac Toe"
 createProgressBar <- function(max) {
   tkProgressBar(
     title = "Progress",
-    label = "Evaluating moves...",
+    label = "Thinking about my options...",
     min   = 0,
     max   = max
   )

@@ -143,6 +143,16 @@ bestMoves <- function(board, player) {
   moves = list()
   scores = matrix(0, 3, 3)
   
+  if (length(possibleMoves(board)) == 9) {
+    # speeds things up
+    return(list(
+      c(1, 2),
+      c(2, 3),
+      c(3, 2),
+      c(2, 1)
+    ))
+  }
+  
   # show a progress bar when we have to analyze more than 1000 possibilities
   possibilities = ceiling(factorial(length(possibleMoves(board))) * 2/3)
   if (possibilities > 1000) {
@@ -168,7 +178,7 @@ bestMoves <- function(board, player) {
     close(prog)
     attr(moveScore, 'progress') <<- NULL
   }
-  
+  # print(scores)
   return(moves)
 }
 
@@ -199,7 +209,7 @@ printBoard <- function(board) {
 # player1 is -1, player2 is 1
 # When playerX.func is NULL, the AI plays for this player
 # Returns the return value of finish.func if present, otherwise NULL
-play <- function(player1.func = NULL, player2.func = NULL, updateBoard.func = NULL, finish.func = NULL) {
+play <- function(player1.func = NULL, player2.func = NULL, updateBoard.func = NULL, finish.func = NULL, min.delay = 1) {
   board = matrix(ncol = 3, byrow = TRUE, data = c(
     0,  0,  0,
     0,  0,  0,
@@ -207,7 +217,7 @@ play <- function(player1.func = NULL, player2.func = NULL, updateBoard.func = NU
   ))
   if(!is.null(updateBoard.func)) updateBoard.func(board)
   
-  player = -1
+  player = sample(c(-1, 1), 1)
   
   while (winner(board) == 0 && !isFull(board)) {
     if (player == -1 && !is.null(player1.func)) {
@@ -215,7 +225,12 @@ play <- function(player1.func = NULL, player2.func = NULL, updateBoard.func = NU
     } else if (player == 1 && !is.null(player2.func)) {
       move = player2.func(board, player)
     } else {
+      start.t = proc.time()['elapsed']
       move = randomMove(bestMoves(board, player))
+      delta.t = proc.time()['elapsed'] - start.t
+      if (delta.t < min.delay) {
+        Sys.sleep(min.delay - delta.t) # make sure the AI takes a certain amount of time to move
+      }
     }
     board = makeMove(board, player, move)
     if(!is.null(updateBoard.func)) updateBoard.func(board)
