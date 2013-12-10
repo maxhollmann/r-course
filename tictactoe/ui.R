@@ -33,7 +33,6 @@ buttonPressed <- function(r, c) {
 
 # callback for moves in the game
 humanMove <- function(board, player) {
-  tktitle(tt) = paste0("Tic Tac Toe - ", playerSign(player), "'s turn")
   attr(humanMove, "waiting") <<- TRUE
   attr(humanMove, "move") <<- NULL
   while (is.null(attr(humanMove, "move"))) {
@@ -42,7 +41,8 @@ humanMove <- function(board, player) {
   return(attr(humanMove, "move"))
 }
 
-updateBoard <- function(board) {
+updateBoard <- function(board, player) {
+  tktitle(tt) = paste0("Tic Tac Toe - ", playerSign(player), "'s turn")
   sapply(1:3, function(row) { 
     sapply(1:3, function(col) { 
       btn <- tkbutton(

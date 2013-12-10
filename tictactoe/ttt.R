@@ -215,9 +215,9 @@ play <- function(player1.func = NULL, player2.func = NULL, updateBoard.func = NU
     0,  0,  0,
     0,  0,  0
   ))
-  if(!is.null(updateBoard.func)) updateBoard.func(board)
   
   player = sample(c(-1, 1), 1)
+  if(!is.null(updateBoard.func)) updateBoard.func(board, player)
   
   while (winner(board) == 0 && !isFull(board)) {
     if (player == -1 && !is.null(player1.func)) {
@@ -233,8 +233,8 @@ play <- function(player1.func = NULL, player2.func = NULL, updateBoard.func = NU
       }
     }
     board = makeMove(board, player, move)
-    if(!is.null(updateBoard.func)) updateBoard.func(board)
     player = -player
+    if(!is.null(updateBoard.func)) updateBoard.func(board, player)
   }
   
   if(!is.null(finish.func)) return(finish.func(winner(board)))

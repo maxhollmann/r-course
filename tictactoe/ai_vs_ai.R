@@ -14,7 +14,7 @@ humanMove <- function() {
   return(move)
 }
 
-updateBoard <- function(board) {
+updateBoard <- function(board, player) {
   printBoard(board)
 }
 
