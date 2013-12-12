@@ -36,11 +36,12 @@ humanMove <- function(board, player) {
     # Hint: take a look at ?floor and ?ceiling and ?round - which is most helpful?
     row = ceiling(loc$y)
     column = ceiling(loc$x)
-    if (row %in% 1:3 && column %in% 1:3) break # only exit the loop when row and column are valid
+    move = c(row, column)
+    if (row %in% 1:3 && column %in% 1:3 && isPossible(board, move)) break # only exit the loop when row and column are valid
   }
   
   # then 
-  return(c(row, column))
+  return(move)
 }
 
 updateBoard <- function(board, player) {
@@ -53,12 +54,37 @@ finished <- function(winner) {
   } else {
     winner = playerSign(winner)
   }
-  cat(paste0(winner, " wins!\n"))
-  return(FALSE)
+  
+  plot(NA, xlim=c(-1, 1), ylim=c(-1, 1), main=paste0(winner, " wins! Play again?"), xlab='', ylab='', asp=1, axes=TRUE)
+  # make a pretty frame
+  rect(-9999, -9999, 9999, 9999, col = 'black')
+  rect(-1, -1, 1, 1, col = 'white')
+  
+  text(0, .5, labels = "Yes")
+  text(0, -.5, labels = "No")
+  abline(0, 0)
+  
+  y = locator(1)$y
+  return(y > 0)
 }
 
-player1.human = TRUE
-player2.human = FALSE
+# Returns 'human' if user selects human, 'ai' if user selects computer
+playerSettingsMenu <- function(player) {
+  plot(NA, xlim=c(-1, 1), ylim=c(-1, 1), main=paste0('Who is playing ', playerSign(player), "?"), xlab='', ylab='', asp=1, axes=TRUE)
+  # make a pretty frame
+  rect(-9999, -9999, 9999, 9999, col = 'black')
+  rect(-1, -1, 1, 1, col = 'white')
+  
+  text(0, .5, labels = "Human")
+  text(0, -.5, labels = "Computer")
+  abline(0, 0)
+  
+  y = locator(1)$y
+  return(ifelse(y > 0, 'human', 'ai'))
+}
+
+player1.human = playerSettingsMenu(-1) == 'human'
+player2.human = playerSettingsMenu(1) == 'human'
 
 continue = TRUE
 while (continue) {
@@ -66,6 +92,8 @@ while (continue) {
     if(player1.human) humanMove else NULL,
     if(player2.human) humanMove else NULL, 
     updateBoard.func = updateBoard,
-    finish.func = finished
+    finish.func = finished,
+    first = 1
   )
 }
+

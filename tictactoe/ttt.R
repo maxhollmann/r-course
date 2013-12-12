@@ -91,6 +91,11 @@ makeMove <- function(board, player, move) {
 # A fork means that the player has at least two fields on which he would win with the next move,
 # meaning that the opponent can't prevent it.
 hasFork <- function(board, player) {
+  wins = 0
+  for (move in possibleMoves(board)) {
+    wins = wins + (winner(makeMove(board, player, move)) == player)
+  }
+  return(wins >= 2)
 }
 
 # Returns the value of the given move. Higher values indicate better moves.
@@ -125,9 +130,15 @@ moveScore <- function(board, player, move, depth = 0) {
     return(8 * 10^(9-depth))
   }
   
-  # TODO give 7 to creating a fork, 6 to preventing one
+  # 7 for creating a fork, 6 for preventing one
+  if (hasFork(nb, player)) {
+    return(7 * 10^(9-depth))
+  }
+  if (hasFork(nb.opp, -player)) {
+    return(6 * 10^(9-depth))
+  }
   
-  # when the above doesn't result in a score, determine what the 
+  # when the above doesn't result in a score, determine what moves enables the highest score in the next round
   best = -Inf
   for (move in possibleMoves(nb)) {
     # good move for other player is bad for this one, so we negate the score
@@ -138,18 +149,22 @@ moveScore <- function(board, player, move, depth = 0) {
 }
 
 # returns the best of all possible moves
-bestMoves <- function(board, player) {
+bestMoves <- function(board, player, use_precomputed = TRUE) {
   best = -Inf
   moves = list()
   scores = matrix(0, 3, 3)
   
-  if (length(possibleMoves(board)) == 9) {
+  if (use_precomputed && length(possibleMoves(board)) == 9) {
     # speeds things up
     return(list(
-      c(1, 2),
-      c(2, 3),
-      c(3, 2),
-      c(2, 1)
+      c(1, 1),
+      #c(1, 2),
+      c(1, 3),
+      #c(2, 1),
+      #c(2, 3),
+      c(3, 1),
+      #c(3, 2),
+      c(3, 3)
     ))
   }
   
@@ -209,14 +224,19 @@ printBoard <- function(board) {
 # player1 is -1, player2 is 1
 # When playerX.func is NULL, the AI plays for this player
 # Returns the return value of finish.func if present, otherwise NULL
-play <- function(player1.func = NULL, player2.func = NULL, updateBoard.func = NULL, finish.func = NULL, min.delay = 1) {
+play <- function(player1.func = NULL, player2.func = NULL, updateBoard.func = NULL, finish.func = NULL, min.delay = 1, first = NULL) {
   board = matrix(ncol = 3, byrow = TRUE, data = c(
     0,  0,  0,
     0,  0,  0,
     0,  0,  0
   ))
   
-  player = sample(c(-1, 1), 1)
+  if (is.null(first)) {
+    player = sample(c(-1, 1), 1)
+  } else {
+    player = first
+  }
+  
   if(!is.null(updateBoard.func)) updateBoard.func(board, player)
   
   while (winner(board) == 0 && !isFull(board)) {
