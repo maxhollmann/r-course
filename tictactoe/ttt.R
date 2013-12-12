@@ -223,20 +223,22 @@ printBoard <- function(board) {
 # Plays a game of tic tac toe
 # player1 is -1, player2 is 1
 # When playerX.func is NULL, the AI plays for this player
+# When updateBoard.func is given, it is called whenever the board changes (with parameters board, player)
+# finish.func is called when the game is over, with the winner as parameter (0 for a draw)
+# min.delay can be used to make sure the AI takes at least min.delay seconds for each turn, to be able to follow along
 # Returns the return value of finish.func if present, otherwise NULL
 play <- function(player1.func = NULL, player2.func = NULL, updateBoard.func = NULL, finish.func = NULL, min.delay = 1, first = NULL) {
-  board = matrix(ncol = 3, byrow = TRUE, data = c(
-    0,  0,  0,
-    0,  0,  0,
-    0,  0,  0
-  ))
+  # initialize empty board
+  board = matrix(0, 3, 3)
   
+  # if no first player is specified, select one at random
   if (is.null(first)) {
     player = sample(c(-1, 1), 1)
   } else {
     player = first
   }
   
+  # allow drawing the empty board
   if(!is.null(updateBoard.func)) updateBoard.func(board, player)
   
   while (winner(board) == 0 && !isFull(board)) {

@@ -6,3 +6,4 @@ tmp
 **/figure
 *.md
 *.txt
+.Rproj.user
