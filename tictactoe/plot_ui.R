@@ -2,7 +2,7 @@ source('ttt.R')
 
 # Draws a single sign on the board (can be 'X' or 'O', otherwise nothing will be drawn)
 drawSign <- function(x, y, sign) {
-  size = 0.309
+  size = 0.309 # golden ratio, yo!
   lwd  = 10
   if (sign == 'X') {
     lines(c(x - size, x + size), c(y - size, y + size), lwd = lwd, col = "darkred")
@@ -14,7 +14,7 @@ drawSign <- function(x, y, sign) {
 
 # Draws the board in it's current state, and indicates who's turn it is in the title of the plot
 drawBoard <- function(board, player = 0) {
-  plot(NA, xlim=c(0, 3), ylim=c(3, 0), main=paste('The Board -', 'Player', playerSign(player)), xlab='', ylab='', asp=1, axes=FALSE)
+  plot(NA, xlim=c(0, 3), ylim=c(3, 0), main=paste0('The Board - ', playerSign(player), "'s turn"), xlab='', ylab='', asp=1, axes=FALSE)
   
   # black out the illegal area
   rect(-9999, -9999, 9999, 9999, col = 'black')
@@ -65,6 +65,7 @@ finished <- function(winner) {
     winner = playerSign(winner)
   }
   
+  # Ask user if he wants to play again
   plot(NA, xlim=c(-1, 1), ylim=c(-1, 1), main=paste0(winner, " wins! Play again?"), xlab='', ylab='', asp=1, axes=FALSE)
   
   # make a pretty frame
@@ -76,7 +77,7 @@ finished <- function(winner) {
   abline(0, 0, lwd = 5)
   
   y = locator(1)$y
-  return(y > 0)
+  return(y > 0) # return TRUE if yes was clicked -> play returns TRUE -> while loop keeps running
 }
 
 # Returns 'human' if user selects human, 'ai' if user selects computer
