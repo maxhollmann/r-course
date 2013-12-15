@@ -10,6 +10,8 @@
 
 ###############################################################################
 # Functions to check who won
+###############################################################################
+
 winnerSum <- function(sums) {
   if (any(sums == 3))  return(3)
   if (any(sums == -3)) return(-3)
@@ -39,9 +41,15 @@ winner <- function(m) {
   if (any(w == 3))  return(1)
   return(0)
 }
-isFull <- function(m) {
-  return(!any(m == 0))
+
+# returns TRUE if no free field is left
+isFull <- function(board) {
+  return(!any(board == 0))
 }
+
+
+###############################################################################
+# Progress bar functions, because the AI can take a really long time sometimes.
 ###############################################################################
 
 createProgressBar <- function(max) {
@@ -54,6 +62,12 @@ createProgressBar <- function(max) {
 increaseProgressBar <- function(bar) {
   setTxtProgressBar(bar, getTxtProgressBar(bar) + 1)
 }
+
+
+
+###############################################################################
+# Helper functions
+###############################################################################
 
 # returns TRUE if the move is possible, FALSE otherwise
 isPossible <- function(board, move) {
@@ -87,6 +101,14 @@ makeMove <- function(board, player, move) {
   return(board)
 }
 
+
+
+###############################################################################
+# AI. Not perfect at all. When AI plays agains AI, the one who begins wins 50%
+# of the time...
+###############################################################################
+
+
 # Returns TRUE if the player has a fork on the board
 # A fork means that the player has at least two fields on which he would win with the next move,
 # meaning that the opponent can't prevent it.
@@ -96,16 +118,6 @@ hasFork <- function(board, player) {
     wins = wins + (winner(makeMove(board, player, move)) == player)
   }
   return(wins >= 2)
-}
-
-# A fork-fork means that the player has at least two fields on which he would create a fork
-# with the next move.
-hasForkFork <- function(board, player) {
-  forks = 0
-  for (move in possibleMoves(board)) {
-    forks = forks + (hasFork(makeMove(board, player, move), player))
-  }
-  return(forks >= 2)
 }
 
 # Returns the value of the given move. Higher values indicate better moves.
@@ -148,14 +160,6 @@ moveScore <- function(board, player, move, depth = 0) {
     return(6 * 10^(9-depth))
   }
   
-  # 5 for preventing a fork-fork, 4 for creating one
-  if (hasForkFork(nb, player)) {
-    return(4 * 10^(9-depth))
-  }
-  if (hasForkFork(nb.opp, -player)) {
-    return(5 * 10^(9-depth))
-  }
-  
   # when the above doesn't result in a score, determine what moves enables the highest score in the next round
   best = -Inf
   for (move in possibleMoves(nb)) {
@@ -167,7 +171,8 @@ moveScore <- function(board, player, move, depth = 0) {
 }
 
 # returns the best of all possible moves
-bestMoves <- function(board, player, use_precomputed = FALSE) {
+# inspiration from http://en.wikipedia.org/wiki/Negamax
+bestMoves <- function(board, player, use_precomputed = TRUE) {
   best = -Inf
   moves = list()
   scores = matrix(0, 3, 3)
@@ -187,6 +192,7 @@ bestMoves <- function(board, player, use_precomputed = FALSE) {
   }
   
   # show a progress bar when we have to analyze more than 1000 possibilities
+  # about 2/3rd of all possible combinations seems to be the maximum of possible legal games
   possibilities = ceiling(factorial(length(possibleMoves(board))) * 2/3)
   if (possibilities > 1000) {
     attr(moveScore, 'progress') <<- createProgressBar(possibilities)
@@ -195,7 +201,6 @@ bestMoves <- function(board, player, use_precomputed = FALSE) {
   for (move in possibleMoves(board)) {
     score = moveScore(board, player, move)
     scores[move[1], move[2]] = score
-    #cat(r, c, "->", score, "\n")
     if (score > best) {
       # replace previously best moves with just the current one, because it has a higher score
       best = score
@@ -211,31 +216,13 @@ bestMoves <- function(board, player, use_precomputed = FALSE) {
     close(prog)
     attr(moveScore, 'progress') <<- NULL
   }
-  # print(scores)
+  
   return(moves)
 }
 
 # returns one of the moves at random
 randomMove <- function(moves) {
-  return(moves[[sample(1:length(moves), 1)]])
-}
-
-# return the sign of the player, or a dot for no player
-playerSign <- function(player) {
-  if (player == -1) return('o')
-  if (player ==  1) return('x')
-  return('.')
-}
-
-# print the board in a prettier way than just showing the matrix
-printBoard <- function(board) {
-  for (r in 1:3) {
-    for (c in 1:3) {
-      cat(playerSign(board[r, c]), " ")
-    }
-    cat("\n")
-  }
-  cat("\n")
+  return(moves[[ sample(1:length(moves), 1) ]])
 }
 
 # Plays a game of tic tac toe
@@ -277,6 +264,142 @@ play <- function(player1.func = NULL, player2.func = NULL, updateBoard.func = NU
     if(!is.null(updateBoard.func)) updateBoard.func(board, player)
   }
   
-  if(!is.null(finish.func)) return(finish.func(winner(board)))
+  if(!is.null(finish.func)) return(finish.func(board))
   return(NULL)
 }
+
+
+###############################################################################
+# The above is generic tic tac toe stuff, the engine so to say. Below is the
+# plot specific stuff.
+###############################################################################
+
+
+# Draws a single sign on the board (can be 'X' or 'O', otherwise nothing will be drawn)
+drawSign <- function(x, y, sign) {
+  size = 0.309 # golden ratio, yo!
+  lwd  = 10
+  if (sign == 'X') {
+    lines(c(x - size, x + size), c(y - size, y + size), lwd = lwd, col = "darkred")
+    lines(c(x + size, x - size), c(y - size, y + size), lwd = lwd, col = "darkred")
+  } else if (sign == 'O') {
+    symbols(x, y, circles = size, lwd = lwd, fg = "darkgreen", inches = FALSE, add = TRUE)
+  }
+}
+
+# Draws just the game on whatever plot is active right now
+drawGame <- function(board) {
+  # draw grid
+  abline(0, 0, h = 1:2, v = 1:2, lwd = 5)
+  
+  for (row in 1:3) {
+    for (col in 1:3) {
+      drawSign(col - .5, row - .5, playerSign(board[row, col]))
+    }
+  }
+}
+
+# Draws the board in it's current state, and indicates who's turn it is in the title of the plot
+drawBoard <- function(board, player = 0) {
+  plot(NA, xlim=c(0, 3), ylim=c(3, 0), main=paste0('The Board - ', playerSign(player), "'s turn"), xlab='', ylab='', asp=1, axes=FALSE)
+  
+  # black out the illegal area
+  rect(-9999, -9999, 9999, 9999, col = 'black')
+  rect(0, 0, 3, 3, col = 'white')
+  
+  drawGame(board)
+}
+
+# draws a button between the two points with the given label
+# returns a function that checks whether a given locator return value falls within the button
+createButton <- function(x1, y1, x2, y2, label) {
+  rect(x1, y1, x2, y2, col = 'white')
+  text(mean(c(x1, x2)), mean(c(y1, y2)), label)
+  
+  return(function(loc) {
+    loc$x >= min(x1, x2) && loc$x <= max(x1, x2) && loc$y >= min(y1, y2) && loc$y <= max(y1, y2)
+  })
+}
+
+# waits for the user to click a button and returns the list key/index of that button
+# buttons is a list of buttons, e.g. list(yes = createButton(...), no = createButton(...))
+getClickedButton <- function(buttons) {
+  repeat {
+    loc = locator(1)
+    for (key in names(buttons)) {
+      if (buttons[[key]](loc)) {
+        return(key)
+      }
+    }
+  }
+}
+
+# return the sign of the player
+playerSign <- function(player) {
+  if (player == -1) return('O')
+  if (player ==  1) return('X')
+  return('')
+}
+
+
+# callback for moves in the game
+humanMove <- function(board, player) {
+  repeat {
+    loc <- locator(1)
+    
+    # convert information in "loc" to the variables "row" and "column".
+    # Hint: take a look at ?floor and ?ceiling and ?round - which is most helpful?
+    row = ceiling(loc$y)
+    column = ceiling(loc$x)
+    move = c(row, column)
+    
+    # only return the move when it is valid
+    if (row %in% 1:3 && column %in% 1:3 && isPossible(board, move)) return(move)
+  }
+}
+
+finished <- function(board) {
+  winner = winner(board)
+  if (winner == 0) {
+    winner = "Nobody"
+  } else {
+    winner = playerSign(winner)
+  }
+  
+  # Ask user if he wants to play again
+  plot(NA, xlim=c(0, 3), ylim=c(3, -1), main=paste0(winner, " wins! Play again?"), xlab='', ylab='', asp=1, axes=FALSE)
+  
+  # make a pretty frame
+  rect(-9999, -9999, 9999, 9999, col = 'black')
+  rect(0, 0, 3, 3, col = 'white')
+  
+  drawGame(board)
+  
+  btns = list(
+    yes = createButton(.1, -.1, 1.4, -.9, "Yes"),
+    no  = createButton(1.6, -.1, 2.9, -.9, "No")
+  )
+  return(getClickedButton(btns) == 'yes')
+}
+
+# Returns 'human' if user selects human, 'ai' if user selects computer
+playerSettingsMenu <- function(player) {
+  plot(NA, xlim=c(-1, 1), ylim=c(-1, 1), main=paste0('Who is playing ', playerSign(player), "?"), xlab='', ylab='', asp=1, axes=FALSE)
+  rect(-9999, -9999, 9999, 9999, col = 'black')
+  
+  btns = list(
+    ai    = createButton(-1, -1, 1, -.1, "Computer"),
+    human = createButton(-1, .1, 1, 1, "Human")
+  )
+  return(getClickedButton(btns))
+}
+
+player1.human = playerSettingsMenu(-1) == 'human'
+player2.human = playerSettingsMenu(1)  == 'human'
+
+while (play(
+  player1.func     = if(player1.human) humanMove else NULL,
+  player2.func     = if(player2.human) humanMove else NULL, 
+  updateBoard.func = drawBoard,
+  finish.func      = finished
+)) {}
